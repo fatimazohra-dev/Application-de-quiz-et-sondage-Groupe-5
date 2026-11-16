@@ -1,0 +1,64 @@
+# Le serveur Quiz Live : 3 copies (réplicas)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-live
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: quiz-live
+  strategy:
+    type: RollingUpdate        # mise à jour progressive, Pod par Pod
+    rollingUpdate:
+      maxUnavailable: 0        # on garde toujours tous les Pods actifs
+      maxSurge: 1              # on peut en ajouter 1 de plus pendant la mise à jour
+  template:
+    metadata:
+      labels:
+        app: quiz-live
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: quiz-live
+          image: quiz-live:1.0
+          imagePullPolicy: IfNotPresent   # l'image est chargée à la main dans Minikube
+          ports:
+            - containerPort: 3000
+          env:
+            - name: REDIS_URL
+              value: redis://redis:6379
+          readinessProbe:                 # le Pod reçoit du trafic seulement quand il est prêt
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:                  # Kubernetes redémarre le Pod s'il ne répond plus
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quiz-live
+spec:
+  type: NodePort
+  selector:
+    app: quiz-live
+  sessionAffinity: ClientIP       # un même client est renvoyé vers le même Pod
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  ports:
+    - port: 80
+      targetPort: 3000
