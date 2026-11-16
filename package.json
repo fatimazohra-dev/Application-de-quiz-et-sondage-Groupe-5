@@ -1,0 +1,15 @@
+{
+  "name": "quiz-live",
+  "version": "1.0.0",
+  "description": "Sondages en temps réel - mini-projet DevOps II",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "express": "^4.19.2",
+    "redis": "^4.6.13",
+    "socket.io": "^4.7.5"
+  }
+}

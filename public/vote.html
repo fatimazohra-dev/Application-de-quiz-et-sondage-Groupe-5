@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voter</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<main>
+  <h1 id="question">Chargement…</h1>
+  <p class="sous-titre" id="message"></p>
+  <div id="choix"></div>
+  <div id="resultats"></div>
+  <p class="erreur" id="erreur"></p>
+  <p class="petit" id="pod"></p>
+</main>
+<script>
+  const code = new URLSearchParams(location.search).get("code");
+  const socket = io({ transports: ["websocket"] });
+  let aVote = false;
+  let dejaAffiche = false;
+
+  try { aVote = localStorage.getItem("vote-" + code) === "1"; } catch (e) {}
+
+  socket.on("connect", () => {
+    socket.emit("rejoindre", code);
+    // Si on a déjà voté, on demande directement les résultats
+    if (aVote) socket.emit("rejoindre-ecran", code);
+  });
+  socket.on("pod", (nom) => { document.getElementById("pod").textContent = "Connecté au serveur : " + nom; });
+  socket.on("erreur", (msg) => { document.getElementById("erreur").textContent = msg; });
+
+  // La question et les réponses possibles
+  socket.on("question", (r) => {
+    if (dejaAffiche) return;
+    dejaAffiche = true;
+    document.getElementById("question").textContent = r.question;
+    if (aVote) {
+      document.getElementById("message").textContent = "Tu as déjà voté. Voici les résultats en direct :";
+      return;
+    }
+    document.getElementById("message").textContent = "Choisis une réponse :";
+    const zone = document.getElementById("choix");
+    r.options.forEach((texte, i) => {
+      const b = document.createElement("button");
+      b.className = "choix";
+      b.textContent = texte;
+      b.addEventListener("click", () => {
+        socket.emit("voter", { code, choix: i });
+        aVote = true;
+        try { localStorage.setItem("vote-" + code, "1"); } catch (e) {}
+        zone.style.display = "none";
+        document.getElementById("message").textContent =
+          "Merci, ton vote est enregistré ! Voici les résultats en direct :";
+      });
+      zone.appendChild(b);
+    });
+  });
+
+  // Les résultats : reçus seulement après avoir voté
+  socket.on("resultats", (r) => {
+    const zone = document.getElementById("resultats");
+    zone.textContent = "";
+    const total = document.createElement("p");
+    total.className = "petit";
+    total.textContent = r.total + " vote(s)";
+    zone.appendChild(total);
+    r.options.forEach((o) => {
+      const pct = r.total ? Math.round((o.votes / r.total) * 100) : 0;
+      const ligne = document.createElement("div");
+      ligne.className = "ligne";
+      const titre = document.createElement("div");
+      titre.className = "titre";
+      const nom = document.createElement("span");
+      nom.textContent = o.texte;
+      const val = document.createElement("span");
+      val.textContent = o.votes + " (" + pct + " %)";
+      titre.append(nom, val);
+      const piste = document.createElement("div");
+      piste.className = "piste";
+      const barre = document.createElement("div");
+      barre.className = "barre";
+      barre.style.width = pct + "%";
+      piste.appendChild(barre);
+      ligne.append(titre, piste);
+      zone.appendChild(ligne);
+    });
+  });
+</script>
+</body>
+</html>

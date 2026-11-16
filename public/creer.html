@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Créer un sondage</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>Créer un sondage</h1>
+  <p class="sous-titre">Écris ta question et 2 à 6 réponses possibles.</p>
+
+  <div class="carte">
+    <label for="question">Question</label>
+    <input type="text" id="question" placeholder="Quel est ton langage préféré ?">
+
+    <label>Réponses</label>
+    <div id="options"></div>
+    <button class="secondaire" id="ajouter">Ajouter une réponse</button>
+
+    <button id="creer">Créer le sondage</button>
+    <p class="erreur" id="erreur"></p>
+  </div>
+</main>
+<script>
+  const conteneur = document.getElementById("options");
+  function ajouterChamp(valeur) {
+    if (conteneur.children.length >= 6) return;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Réponse " + (conteneur.children.length + 1);
+    input.value = valeur || "";
+    conteneur.appendChild(input);
+  }
+  ajouterChamp(); ajouterChamp(); ajouterChamp();
+  document.getElementById("ajouter").addEventListener("click", () => ajouterChamp());
+
+  document.getElementById("creer").addEventListener("click", async () => {
+    const question = document.getElementById("question").value;
+    const options = Array.from(conteneur.children).map((i) => i.value);
+    const rep = await fetch("/api/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, options }),
+    });
+    const data = await rep.json();
+    if (!rep.ok) {
+      document.getElementById("erreur").textContent = data.erreur;
+      return;
+    }
+    window.location = "ecran.html?code=" + data.code;
+  });
+</script>
+</body>
+</html>

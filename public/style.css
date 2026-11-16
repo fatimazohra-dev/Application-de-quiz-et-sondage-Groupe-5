@@ -1,0 +1,85 @@
+:root {
+  --ink: #1b2340;
+  --soft: #5b6480;
+  --bg: #f2f4f8;
+  --card: #ffffff;
+  --line: #d9dee8;
+  --accent: #3d5afe;
+  --accent-dark: #2a3fd0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 1.9rem; margin: 8px 0 4px; }
+h2 { font-size: 1.2rem; margin: 0 0 12px; }
+p.sous-titre { color: var(--soft); margin: 0 0 24px; }
+.carte {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+label { display: block; font-weight: 600; margin: 12px 0 4px; }
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+button, a.bouton {
+  display: inline-block;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover, a.bouton:hover { background: var(--accent-dark); }
+button:focus-visible, a.bouton:focus-visible, input:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+button.secondaire {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  margin-bottom: 12px;
+}
+button.choix {
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  text-align: left;
+  margin-bottom: 10px;
+}
+button.choix:hover { border-color: var(--accent); background: #eef1ff; }
+button:disabled { opacity: 0.55; cursor: default; }
+.code {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin: 0;
+}
+.petit { color: var(--soft); font-size: 0.9rem; }
+.erreur { color: #b3261e; font-weight: 600; }
+.ligne { margin-bottom: 14px; }
+.ligne .titre { display: flex; justify-content: space-between; margin-bottom: 4px; font-weight: 600; }
+.piste { background: #e6e9f2; border-radius: 6px; height: 28px; overflow: hidden; }
+.barre { background: var(--accent); height: 100%; width: 0; transition: width 0.4s; }
+@media (prefers-reduced-motion: reduce) { .barre { transition: none; } }
