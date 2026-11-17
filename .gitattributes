@@ -1,0 +1,5 @@
+# Scripts exécutés sous Linux par Jenkins : toujours en fin de ligne LF
+*.sh        text eol=lf
+Jenkinsfile text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf

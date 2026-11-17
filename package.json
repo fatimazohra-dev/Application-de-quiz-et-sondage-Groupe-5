@@ -4,7 +4,8 @@
   "description": "Sondages en temps réel - mini-projet DevOps II",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
