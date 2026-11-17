@@ -1,0 +1,7 @@
+# Surcharge utilisée par Jenkins : l'image est déjà construite par le pipeline,
+# et aucun port n'est publié sur l'hôte (évite les conflits sur le port 3000).
+services:
+  app:
+    image: ${IMAGE:-quiz-live}:${TAG:-ci}
+    build: !reset null
+    ports: !reset []
