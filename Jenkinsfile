@@ -42,11 +42,11 @@ pipeline {
       steps {
         // App + Redis dans un réseau isolé (pas de port publié sur l'hôte)
         sh 'docker compose -p $COMPOSE_PROJECT -f docker-compose.yml -f docker-compose.ci.yml up -d'
-        // Tests exécutés dans un conteneur Node branché sur ce réseau
+        // Tests exécutés avec l'image qu'on vient de construire (elle contient test/).
+        // Pas de montage de volume : fonctionne aussi quand Jenkins tourne dans Docker.
         sh '''
           docker run --rm --network ${COMPOSE_PROJECT}_default \
-            -e BASE_URL=http://app:3000 \
-            -v "$PWD":/src -w /src node:20-alpine npm test
+            -e BASE_URL=http://app:3000 $IMAGE:$TAG npm test
         '''
       }
       post {
