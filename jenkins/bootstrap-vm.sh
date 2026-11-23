@@ -91,6 +91,26 @@ else
   mk start --driver=docker --cpus="$MINIKUBE_CPUS" --memory="$MINIKUBE_MEMORY"
 fi
 mk addons enable ingress >/dev/null && ok "addon ingress activé"
+# Redémarrage automatique du cluster au boot de la VM (le conteneur minikube n'a pas de restart policy)
+sudo tee /etc/systemd/system/minikube.service >/dev/null <<UNIT
+[Unit]
+Description=Minikube (cluster Quiz Live)
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=$USER
+ExecStart=/usr/local/bin/minikube start
+ExecStop=/usr/local/bin/minikube stop
+TimeoutStartSec=600
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+sudo systemctl daemon-reload
+sudo systemctl enable minikube.service >/dev/null 2>&1 && ok "Minikube démarrera au boot de la VM"
 kubectl get nodes
 MINIKUBE_IP="$(mk ip)"
 ok "API Kubernetes : https://${MINIKUBE_IP}:8443"
