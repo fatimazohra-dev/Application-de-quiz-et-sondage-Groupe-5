@@ -65,7 +65,10 @@ ask_value() {    # ask_value NOM_VARIABLE "Question"
 xml_escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' <<<"$1"; }
 
 cli() {
-  java -jar "$CLI_JAR" -s "$JENKINS_URL" -webSocket -auth "$JENKINS_USER:$JENKINS_TOKEN" "$@"
+  # -http (et non -webSocket) : le mode WebSocket refuse la connexion quand l'URL
+  # utilisée (ex. localhost:8080 dans le conteneur) diffère de l'URL racine de
+  # Jenkins (ex. localhost:8082 via le tunnel) -> "Unexpected request origin"
+  java -jar "$CLI_JAR" -s "$JENKINS_URL" -http -auth "$JENKINS_USER:$JENKINS_TOKEN" "$@"
 }
 
 wait_jenkins() {
