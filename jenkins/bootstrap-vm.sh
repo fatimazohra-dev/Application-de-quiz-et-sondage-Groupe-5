@@ -148,7 +148,8 @@ cat <<EOF
 =============================================================================
  Jenkins : port ${JENKINS_PORT} de la VM
    Depuis votre PC (tunnel SSH, recommandé) :
-     gcloud compute ssh quiz-vm --zone=europe-west1-b -- -L ${JENKINS_PORT}:localhost:${JENKINS_PORT}
+     ssh -L ${JENKINS_PORT}:localhost:${JENKINS_PORT} quiz-vm      (alias défini dans ~/.ssh/config)
+     ou, dans PowerShell : gcloud compute ssh quiz-vm --zone=europe-west1-b '--' -L ${JENKINS_PORT}:localhost:${JENKINS_PORT}
      puis ouvrez http://localhost:${JENKINS_PORT}
 
  Mot de passe initial : ${PASS:-"(pas encore prêt : sudo docker exec ${JENKINS_NAME} cat /var/jenkins_home/secrets/initialAdminPassword)"}
