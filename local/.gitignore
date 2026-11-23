@@ -1,0 +1,2 @@
+# Contient les credentials Jenkins (token Docker Hub) : à partager en privé, JAMAIS sur GitHub
+jenkins-home.tar.gz

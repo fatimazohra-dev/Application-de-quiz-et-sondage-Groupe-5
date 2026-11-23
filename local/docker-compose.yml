@@ -1,0 +1,66 @@
+# =============================================================================
+#  Stack locale Quiz Live : tout l'environnement sur un PC avec Docker Desktop
+#    - k3s      : cluster Kubernetes 1.37 dans un conteneur (remplace Minikube)
+#    - deploy   : remet l'application dans le cluster au premier démarrage
+#    - jenkins  : le même Jenkins que sur la VM (jobs, historique, credentials)
+#  Lancement : local/start.ps1 (Windows) ou local/start.sh (Mac/Linux)
+# =============================================================================
+name: quiz-live-local
+
+services:
+  k3s:
+    image: rancher/k3s:v1.37.0-k3s1
+    command:
+      - server
+      - --disable=traefik
+      - --disable=metrics-server
+      - --tls-san=k3s
+      - --write-kubeconfig=/output/kubeconfig.yaml
+      - --write-kubeconfig-mode=644
+    privileged: true
+    tmpfs:
+      - /run
+      - /var/run
+    ports:
+      - "30080:30080"   # application Quiz Live (NodePort du Service)
+      - "6443:6443"     # API Kubernetes (kubectl depuis le PC, facultatif)
+    volumes:
+      - k3s-data:/var/lib/rancher/k3s
+      - kubeconfig:/output
+    restart: unless-stopped
+
+  deploy:
+    image: alpine/k8s:1.37.0
+    depends_on:
+      - k3s
+    environment:
+      QUIZ_IMAGE: ${QUIZ_IMAGE:-anass123wq/quiz-live:latest}
+    volumes:
+      - kubeconfig:/output:ro
+      - ../k8s:/k8s:ro
+      - ./scripts:/scripts:ro
+    entrypoint: ["/bin/sh", "/scripts/deploy-initial.sh"]
+    restart: "no"
+
+  jenkins:
+    build: ../jenkins
+    image: jenkins-quiz:2.580.2
+    depends_on:
+      - k3s
+    ports:
+      - "8082:8080"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kubeconfig:/k3s:ro
+      - ./init.groovy.d:/var/jenkins_home/init.groovy.d:ro
+    restart: unless-stopped
+
+volumes:
+  jenkins-data:
+    name: quiz-live-jenkins-data     # créé et restauré depuis jenkins-home.tar.gz par start.ps1/start.sh
+    external: true
+  k3s-data:
+    name: quiz-live-k3s-data
+  kubeconfig:
+    name: quiz-live-kubeconfig

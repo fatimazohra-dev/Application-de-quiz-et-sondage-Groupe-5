@@ -3,7 +3,8 @@
 #   - kubectl (déploiement sur Minikube)
 #   - plugins du Jenkinsfile préinstallés
 # Construction : docker build -t jenkins-quiz jenkins/
-FROM jenkins/jenkins:lts
+# Version figée = celle de la VM (les plugins du volume jenkins-home correspondent à cette version)
+FROM jenkins/jenkins:2.580.2-lts
 
 USER root
 RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
@@ -15,7 +16,7 @@ RUN apt-get update && apt-get install -y ca-certificates curl gnupg \
  && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL -o /usr/local/bin/kubectl \
-      "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+      "https://dl.k8s.io/release/v1.37.2/bin/linux/amd64/kubectl" \
  && chmod +x /usr/local/bin/kubectl
 
 # Plugins nécessaires au Jenkinsfile (+ ceux de l'assistant "suggested plugins" utiles ici)

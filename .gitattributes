@@ -3,3 +3,5 @@
 Jenkinsfile text eol=lf
 *.yml       text eol=lf
 *.yaml      text eol=lf
+*.groovy    text eol=lf
+*.ps1       text eol=crlf

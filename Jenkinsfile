@@ -5,7 +5,6 @@ pipeline {
   agent any
 
   environment {
-    TAG = "${env.BUILD_NUMBER}"                       // une version unique par build
     COMPOSE_PROJECT = "quiz-ci-${env.BUILD_NUMBER}"   // stack de test isolée
   }
 
@@ -27,6 +26,12 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
                           usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
           script { env.IMAGE = "${DH_USER}/quiz-live" }
+        }
+        // Tag = n° de build + commit : unique même si plusieurs Jenkins (PC de l'équipe)
+        // poussent vers le même dépôt Docker Hub
+        script {
+          def sha = sh(script: 'git rev-parse --short=7 HEAD', returnStdout: true).trim()
+          env.TAG = "${env.BUILD_NUMBER}-${sha}"
         }
         echo "Image : ${env.IMAGE}:${env.TAG}"
       }

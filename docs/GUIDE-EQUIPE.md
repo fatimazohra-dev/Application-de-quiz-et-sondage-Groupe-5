@@ -37,7 +37,7 @@ par un tunnel SSH, et tout le monde voit le même Jenkins et le même cluster.
 Dans un terminal (PowerShell, Terminal Mac/Linux) — **gardez-le ouvert** :
 
 ```bash
-gcloud compute ssh quiz-vm '--' -L 8082:localhost:8082 -L 3000:192.168.49.2:31829
+gcloud compute ssh quiz-vm '--' -L 8082:localhost:8082 -L 3000:192.168.49.2:30080
 ```
 
 | Dans votre navigateur | Ce que c'est |
@@ -48,7 +48,7 @@ gcloud compute ssh quiz-vm '--' -L 8082:localhost:8082 -L 3000:192.168.49.2:3182
 - `'--'` entre guillemets : obligatoire dans PowerShell (sinon PowerShell le supprime).
 - La première connexion crée une clé SSH : répondez `y` à la question *Store key in cache?*.
 - Si l'application ne répond pas sur 3000, le port NodePort a peut-être changé :
-  `kubectl get svc quiz-live` (sur la VM) et remplacez `31829`.
+  `kubectl get svc quiz-live` (sur la VM) et remplacez `30080`.
 
 **La VM est arrêtée ?** (`gcloud compute instances list` → `TERMINATED`)
 ```bash
